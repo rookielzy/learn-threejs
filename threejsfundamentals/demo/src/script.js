@@ -42,6 +42,31 @@ const cube = new THREE.Mesh(geometry, material)
 scene.add(cube)
 
 // 8. 最后我们需要将我们上述所添加的数据绘制到画布上，这时候就是该渲染器 `Renderer` 出场了
-renderer.render(scene, camera)
+// renderer.render(scene, camera)
 
 // 9. 打开页面后，你就能看到一个绿色的长方形。不是说好是立方体吗？别着急，你还可以注意到整个图像特别模糊，我们接下来就会处理它。
+
+// 11. 这里我们简单处理一下图像模糊的问题，更优的解决办法将会在后面展示
+// 前面我们知道画布是有宽高比的，为什么图像会模糊呢，就是应为我们的 `canvas` 画布的宽高比实际并不等于 2
+// 因此我们只需要使用 `canvas` 真实的宽高来计算出宽高比 `aspect` 即可
+camera.aspect = canvas.clientWidth / canvas.clientHeight
+camera.updateProjectionMatrix()
+// 上述方法解决了图像拉伸的问题，但图像的锯齿感仍然很严重
+// 因此我们需要重新设置一下渲染器的尺寸，我们先简单的用 `canvas` 画布尺寸来对渲染器尺寸进行赋值
+renderer.setSize(canvas.clientWidth | 0, canvas.clientHeight | 0, false)
+
+// 10. 我们先让这个立方体动起来
+function render(time) {
+  time *= 0.001 // 将时间单位变成秒
+
+  // 每一帧都变换立方体的 x 与 y 的值
+  cube.rotation.x = time
+  cube.rotation.y = time
+
+  renderer.render(scene, camera)
+
+  requestAnimationFrame(render)
+}
+
+// 根据屏幕刷新率来绘制每一帧的效果
+requestAnimationFrame(render)
