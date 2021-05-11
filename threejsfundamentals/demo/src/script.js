@@ -39,31 +39,42 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth)
 
 // 5. 由于场景里有了光源，我们也想在立方体上体现光源的效果，因此这里的材质需要用 `MeshPhongMaterial`
 // 这个材质将会收到光源的影响
-const material = new THREE.MeshPhongMaterial({color: 0x44aa88})
+// 我们抽象出立方体的工厂方法，方便我们后续创建更多的立方体
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color})
 
-// 6. 有了立方体基础形状和材质之后，我们就需要一个网格对象 `Mesh` 来应用这两个属性，并呈现在页面上。
-// 为什么要用网格对象 `Mesh` 呢？因为 `Three.js` 实际就是一个封装了 `WebGL` 基础操作的图形库；在 `WebGL` 中只存在简单的三角形，线段
-// 没有现成的立方体；也就是说在画一个立方体，我们需要用多个三角形拼接而成。而上述的 `Geometry` 就是指立方体是如何通过三角形拼接而成的，
-// 网格 `Mesh` 对象就是应用了几何体与材质之后的产物
-const cube = new THREE.Mesh(geometry, material)
+  const cube = new THREE.Mesh(geometry, material)
+  scene.add(cube)
 
-// 7. 要呈现这个立方体，我们需要将这个立方体放置到场景中 `Scene` 就如 README 中第一张图（`Three.js` 的应用结构）所示
-scene.add(cube)
+  cube.position.x = x
 
-// 8. 这里我们简单处理一下图像模糊的问题
+  return cube
+}
+
+const cubes = [
+  makeInstance(geometry, 0x44aa88, 0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844, 2)
+]
+
+// 6. 这里我们简单处理一下图像模糊的问题
 camera.aspect = canvas.clientWidth / canvas.clientHeight
 camera.updateProjectionMatrix()
 // 上述方法解决了图像拉伸的问题，但图像的锯齿感仍然很严重
 // 因此我们需要重新设置一下渲染器的尺寸，我们先简单的用 `canvas` 画布尺寸来对渲染器尺寸进行赋值
 renderer.setSize(canvas.clientWidth | 0, canvas.clientHeight | 0, false)
 
-// 9. 我们先让这个立方体动起来
+// 7. 我们先让这个立方体动起来
 function render(time) {
   time *= 0.001 // 将时间单位变成秒
 
   // 每一帧都变换立方体的 x 与 y 的值
-  cube.rotation.x = time
-  cube.rotation.y = time
+  cubes.forEach((cube, index) => {
+    const speed = 1 + index * 0.1
+    const rot = time * speed
+    cube.rotation.x = rot
+    cube.rotation.y = rot
+  })
 
   renderer.render(scene, camera)
 

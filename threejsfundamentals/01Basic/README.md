@@ -32,3 +32,7 @@
 ## 引入光源
 
 ![threejs-1cube-with-directionallight](../images/threejs-1cube-with-directionallight.svg)
+
+## 多个 3D 对象
+
+![threejs-3cubes-scene](../images/threejs-3cubes-scene.svg)
