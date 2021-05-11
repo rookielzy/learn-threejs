@@ -22,24 +22,15 @@ camera.position.z = 2
 // 3. 创建一个场景 Scene，后面我们所绘制的东西都需要加入到场景中去
 const scene = new THREE.Scene()
 
-// 4. 为了使我们的立体效果更明显，我们先来加一盏平行光
-{
-  const color = 0xffffff
-  const intensity = 1
-  const light = new THREE.DirectionalLight(color, intensity)
-  light.position.set(-1, 2, 4)
-  scene.add(light)
-}
-
 // 4. 用 Three.js 提供的 `BoxGeometry` 来创建一个立方体几何体，这是立方体的基础形状
 const boxWidth = 1
 const boxHeight = 1
 const boxDepth = 1
 const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth)
 
-// 5. 由于场景里有了光源，我们也想在立方体上体现光源的效果，因此这里的材质需要用 `MeshPhongMaterial`
-// 这个材质将会收到光源的影响
-const material = new THREE.MeshPhongMaterial({color: 0x44aa88})
+// 5. 有了基础形状后，我们需要材质 `Material` 来设置如何绘制物体（譬如颜色，贴图，光滑还是平整）
+// 这里我们用 `MeshBasicMaterial` 来确定立方体的材质，一个以简单着色（平面或线框）方式来绘制几何体的材质。
+const material = new THREE.MeshBasicMaterial({color: 0x44aa88})
 
 // 6. 有了立方体基础形状和材质之后，我们就需要一个网格对象 `Mesh` 来应用这两个属性，并呈现在页面上。
 // 为什么要用网格对象 `Mesh` 呢？因为 `Three.js` 实际就是一个封装了 `WebGL` 基础操作的图形库；在 `WebGL` 中只存在简单的三角形，线段
@@ -50,14 +41,21 @@ const cube = new THREE.Mesh(geometry, material)
 // 7. 要呈现这个立方体，我们需要将这个立方体放置到场景中 `Scene` 就如 README 中第一张图（`Three.js` 的应用结构）所示
 scene.add(cube)
 
-// 8. 这里我们简单处理一下图像模糊的问题
+// 8. 最后我们需要将我们上述所添加的数据绘制到画布上，这时候就是该渲染器 `Renderer` 出场了
+// renderer.render(scene, camera)
+
+// 9. 打开页面后，你就能看到一个绿色的长方形。不是说好是立方体吗？别着急，你还可以注意到整个图像特别模糊，我们接下来就会处理它。
+
+// 11. 这里我们简单处理一下图像模糊的问题，更优的解决办法将会在后面展示
+// 前面我们知道画布是有宽高比的，为什么图像会模糊呢，就是应为我们的 `canvas` 画布的宽高比实际并不等于 2
+// 因此我们只需要使用 `canvas` 真实的宽高来计算出宽高比 `aspect` 即可
 camera.aspect = canvas.clientWidth / canvas.clientHeight
 camera.updateProjectionMatrix()
 // 上述方法解决了图像拉伸的问题，但图像的锯齿感仍然很严重
 // 因此我们需要重新设置一下渲染器的尺寸，我们先简单的用 `canvas` 画布尺寸来对渲染器尺寸进行赋值
 renderer.setSize(canvas.clientWidth | 0, canvas.clientHeight | 0, false)
 
-// 9. 我们先让这个立方体动起来
+// 10. 我们先让这个立方体动起来
 function render(time) {
   time *= 0.001 // 将时间单位变成秒
 

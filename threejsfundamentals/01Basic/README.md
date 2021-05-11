@@ -1,5 +1,9 @@
 # Three.js 基础
 
+代码目录请参考 [demo 目录](../demo)，并按照数字升序阅读
+
+* [1.js - 基础的立方体图像](../demo/src/1.js)
+
 首先先要清楚 `Three.js` 的应用结构，如下图所示：
 
 ![threejs-structure](../images/threejs-structure.svg)
@@ -24,3 +28,7 @@
 ## 摄像机位置
 
 ![scene-down](../images/scene-down.svg)
+
+## 引入光源
+
+![threejs-1cube-with-directionallight](../images/threejs-1cube-with-directionallight.svg)
