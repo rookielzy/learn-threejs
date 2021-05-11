@@ -57,16 +57,30 @@ const cubes = [
   makeInstance(geometry, 0xaa8844, 2)
 ]
 
-// 6. 这里我们简单处理一下图像模糊的问题
-camera.aspect = canvas.clientWidth / canvas.clientHeight
-camera.updateProjectionMatrix()
-// 上述方法解决了图像拉伸的问题，但图像的锯齿感仍然很严重
-// 因此我们需要重新设置一下渲染器的尺寸，我们先简单的用 `canvas` 画布尺寸来对渲染器尺寸进行赋值
-renderer.setSize(canvas.clientWidth | 0, canvas.clientHeight | 0, false)
+// 6. 这里我们简单处理一下图像模糊的问题，这种处理方法有点问题，就是在我们的浏览器窗口尺寸变化时，图像仍然被拉伸了
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement
+  const width = canvas.clientWidth
+  const height = canvas.clientHeight
+  const needResize = canvas.width !== width || canvas.height !== height
+
+  if (needResize) {
+    renderer.setSize(width, height, false)
+  }
+
+  return needResize
+}
 
 // 7. 我们先让这个立方体动起来
 function render(time) {
   time *= 0.001 // 将时间单位变成秒
+
+  // 在每一帧我们都检测是否需要调整渲染器尺寸
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement
+    camera.aspect = canvas.clientWidth / canvas.clientHeight
+    camera.updateProjectionMatrix()
+  }
 
   // 每一帧都变换立方体的 x 与 y 的值
   cubes.forEach((cube, index) => {
