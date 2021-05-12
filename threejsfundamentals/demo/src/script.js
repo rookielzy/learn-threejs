@@ -5,24 +5,22 @@ import * as THREE from 'three'
 // 0. 画布
 const canvas = document.querySelector('#canvas')
 
-// 1. 渲染器：负责将所有数据渲染绘制到 canvas 上
+// 1. 渲染器
 const renderer = new THREE.WebGLRenderer({canvas})
+renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
 
-// 2. 为了能看到图像，我们需要一双眼睛，即摄像机，这里我们用透视摄像机（PerspectiveCamera）
-const fov = 75  // 视野范围（field of view）此处指垂直方向为 75 度
-const aspect = 2  // 默认值为 2，指画布的宽高比
-const near = 0.1  // 近平面
-const far = 5 // 远平面
-// 近平面和远平面限制了摄像机面朝方向的可绘制区域，可参考 READNE 中的第三张图
+// 2. 摄像机
+const fov = 75
+const aspect = canvas.clientWidth / canvas.clientHeight
+const near = 0.1
+const far = 5
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
-
-// 摄像机默认指向 Z 轴负方向，上方向朝向 Y 轴正方向，待会我们会把立方体放置在坐标原点，因此我们需要将摄像机往后移。效果如 README 中的第四张图
 camera.position.z = 2
 
-// 3. 创建一个场景 Scene，后面我们所绘制的东西都需要加入到场景中去
+// 3. 场景
 const scene = new THREE.Scene()
 
-// 4. 为了使我们的立体效果更明显，我们先来加一盏平行光
+// 4. 光源
 {
   const color = 0xffffff
   const intensity = 1
@@ -31,63 +29,27 @@ const scene = new THREE.Scene()
   scene.add(light)
 }
 
-// 4. 用 Three.js 提供的 `BoxGeometry` 来创建一个立方体几何体，这是立方体的基础形状
-const boxWidth = 1
-const boxHeight = 1
-const boxDepth = 1
-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth)
+const objects = []
 
-// 5. 由于场景里有了光源，我们也想在立方体上体现光源的效果，因此这里的材质需要用 `MeshPhongMaterial`
-// 这个材质将会收到光源的影响
-// 我们抽象出立方体的工厂方法，方便我们后续创建更多的立方体
-function makeInstance(geometry, color, x) {
-  const material = new THREE.MeshPhongMaterial({color})
+// BoxGeometry
+{
+  const width = 0.1
+  const height = 0.1
+  const depth = 0.1
+  const geometry = new THREE.BoxGeometry(width, height, depth)
+  const material = new THREE.MeshPhongMaterial({color: 0x44aa88})
+  const box = new THREE.Mesh(geometry, material)
 
-  const cube = new THREE.Mesh(geometry, material)
-  scene.add(cube)
-
-  cube.position.x = x
-
-  return cube
+  objects.push(box)
+  scene.add(box)
 }
 
-const cubes = [
-  makeInstance(geometry, 0x44aa88, 0),
-  makeInstance(geometry, 0x8844aa, -2),
-  makeInstance(geometry, 0xaa8844, 2)
-]
-
-// 6. 这里我们简单处理一下图像模糊的问题，这种处理方法有点问题，就是在我们的浏览器窗口尺寸变化时，图像仍然被拉伸了
-function resizeRendererToDisplaySize(renderer) {
-  const canvas = renderer.domElement
-  const width = canvas.clientWidth
-  const height = canvas.clientHeight
-  const needResize = canvas.width !== width || canvas.height !== height
-
-  if (needResize) {
-    renderer.setSize(width, height, false)
-  }
-
-  return needResize
-}
-
-// 7. 我们先让这个立方体动起来
 function render(time) {
-  time *= 0.001 // 将时间单位变成秒
+  time *= 0.001
 
-  // 在每一帧我们都检测是否需要调整渲染器尺寸
-  if (resizeRendererToDisplaySize(renderer)) {
-    const canvas = renderer.domElement
-    camera.aspect = canvas.clientWidth / canvas.clientHeight
-    camera.updateProjectionMatrix()
-  }
-
-  // 每一帧都变换立方体的 x 与 y 的值
-  cubes.forEach((cube, index) => {
-    const speed = 1 + index * 0.1
-    const rot = time * speed
-    cube.rotation.x = rot
-    cube.rotation.y = rot
+  objects.forEach(obj => {
+    obj.rotation.x = time
+    obj.rotation.y = time
   })
 
   renderer.render(scene, camera)
@@ -95,5 +57,4 @@ function render(time) {
   requestAnimationFrame(render)
 }
 
-// 根据屏幕刷新率来绘制每一帧的效果
 requestAnimationFrame(render)
