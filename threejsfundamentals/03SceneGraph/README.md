@@ -1,6 +1,8 @@
 # 场景图
 
 * [5.js - 太阳系](../demo/src/5.js)
+* [6.js - 坦克运动模型](../demo/src/6.js)
+
 
 `Three.js` 最重要的核心就是它的场景图（Scene Graph)。场景图就如同一个树的层级结构，每个节点都代表了一个局部空间。如下图所示：
 
@@ -21,3 +23,7 @@
 完善太阳系
 
 ![scenegraph-sun-earth-moon](../images/scenegraph-sun-earth-moon.svg)
+
+## 坦克运动模型
+
+![scenegraph-tank](../images/scenegraph-tank.svg)
