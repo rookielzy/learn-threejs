@@ -66,11 +66,14 @@ earthOrbit.add(earthMesh)
 objects.push(earthMesh)
 
 // moon
+const moonOrbit = new THREE.Object3D()
+moonOrbit.position.x = 2
+earthOrbit.add(moonOrbit)
+
 const moonMaterial = new THREE.MeshPhongMaterial({color: 0x888888, emissive: 0x222222})
 const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial)
-moonMesh.position.x = 2
 moonMesh.scale.set(0.5, 0.5, 0.5)
-earthOrbit.add(moonMesh)
+moonOrbit.add(moonMesh)
 objects.push(moonMesh)
 
 function render(time) {
