@@ -31,11 +31,16 @@ const widthSegments = 6
 const heightSegments = 6
 const sphereGeometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments)
 
+// 引入太阳系节点来解决节点尺寸变化影响子节点的问题
+const solarSystem = new THREE.Object3D()
+scene.add(solarSystem)
+objects.push(solarSystem)
+
 // sun  默认位置在原点
 const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xffff00})
 const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial)
 sunMesh.scale.set(5, 5, 5)  // 放大太阳的尺寸大小
-scene.add(sunMesh)
+solarSystem.add(sunMesh)
 objects.push(sunMesh)
 
 // 光源默认位置在原点，在此加上光源，模拟太阳发出的光
@@ -52,7 +57,7 @@ const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial)
 earthMesh.position.x = 10
 // scene.add(earthMesh) 如果直接把地球加入到场景中，地球就不会围着太阳公转了
 // 因此需要将地球成为太阳的子节点
-sunMesh.add(earthMesh)  // 此时放大了太阳间接也放大了太阳的子节点
+solarSystem.add(earthMesh)  // 此时放大了太阳间接也放大了太阳的子节点
 objects.push(earthMesh)
 
 function render(time) {

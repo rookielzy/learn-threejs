@@ -11,3 +11,7 @@
 太阳与地球
 
 ![scenegraph-sun-earth](../images/scenegraph-sun-earth.svg)
+
+引入太阳系
+
+![scenegraph-sun-earth-fixed](../images/scenegraph-sun-earth-fixed.svg)
