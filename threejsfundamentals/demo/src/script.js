@@ -51,14 +51,27 @@ objects.push(sunMesh)
   scene.add(light)
 }
 
+// 同理，我们来创建一个以地球为中心的节点
+const earthOrbit = new THREE.Object3D()
+earthOrbit.position.x = 10
+solarSystem.add(earthOrbit)
+objects.push(earthOrbit)
+
 // earth
 const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233ff, emissive: 0x112244})
 const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial)
-earthMesh.position.x = 10
 // scene.add(earthMesh) 如果直接把地球加入到场景中，地球就不会围着太阳公转了
 // 因此需要将地球成为太阳的子节点
-solarSystem.add(earthMesh)  // 此时放大了太阳间接也放大了太阳的子节点
+earthOrbit.add(earthMesh)
 objects.push(earthMesh)
+
+// moon
+const moonMaterial = new THREE.MeshPhongMaterial({color: 0x888888, emissive: 0x222222})
+const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial)
+moonMesh.position.x = 2
+moonMesh.scale.set(0.5, 0.5, 0.5)
+earthOrbit.add(moonMesh)
+objects.push(moonMesh)
 
 function render(time) {
   time *= 0.001
