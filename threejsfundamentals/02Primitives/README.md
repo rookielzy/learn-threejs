@@ -4,4 +4,4 @@
 
 罗列的图元请参考 [Primitives](https://threejsfundamentals.org/threejs/lessons/threejs-primitives.html)
 
-试玩请参考 [4.js](../demo/src/4.js)
+试玩请参考 [4.js - 图元试玩](../demo/src/4.js)
