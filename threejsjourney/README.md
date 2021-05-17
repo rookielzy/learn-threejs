@@ -56,3 +56,42 @@
 这里需要注意一点，在 `three.js` 中，对象的颜色都是通过 `Color` 类来设置的；但我们使用 `dat.gui` 的 `addColor` 方法时，只能获取颜色的十六进制数，同时我们无法直接改变材质的颜色；因此我们通过监听另外一个颜色变量的变化来设置材质的颜色。
 
 具体代码参考 [6.js](./demo/src/6.js)
+
+## 材质/纹理 `Texture`
+
+材质是什么呢？材质就是覆盖在几何体结构 `Geometry` 上的图像。我们之前接触到的材质都是简单的颜色材质，在实际的开发过程中我们需要更多多样化的材质，不同类型的材质在呈现上也有不同的效果，不仅仅是颜色上的差异。下面我们来认识几种典型的材质类型：
+
+* ***albedo texture*** 是最简单的一种，它只会将纹理的像素并作用于几何体结构上
+
+![albedo-texture](./images/albedo-texture.jpeg)
+
+* ***alpha texture*** 是一种灰度图像，在其中白色可见，黑色的则不可见
+
+![alpha-texture](./images/alpha-texture.jpeg)
+
+* ***height texture*** 是一种灰度图像，它还包含了一些高度信息，这些高度信息可以辅助我们将图像的呈现变得更加接近自然、真实
+
+![height-texture](./images/height-texture.png)
+
+* ***normal texture*** 是一种模拟凹凸处光照效果的技术，可以在不添加多余的顶点的情况下，展现更多的细节，因此它的性能也非常优异。同时还可以模拟不同角度查看图形时，光照效果也不一样
+
+![normal-texture](./images/normal-texture.jpeg)
+
+* ***ambient occlusion*** 是一种灰度图像，用于计算场景中每个顶点是如何接受环境光的，这种贴图并不能展示真实的阴影情况，但能形成明显对比，增强层次感
+
+![ambient-occlusion](./images/ambient-occlusion.jpeg)
+
+* ***metalness*** 是一种灰度图像，白色部分表示这部分为金属，黑色为非金属；这些信息有助于生成光线反射
+
+![metalness](./images/metalness.jpeg)
+
+* ***Roughness*** 是一种带有金属性质的灰度图像，白色部分表示这部分为粗糙的，黑色为光滑的。这些信息有助于消除散光
+
+上述这些贴图都遵循 `PBR - Physically Based Rendering` 基于物理的渲染，相关内容比较深奥，下面仅提供参考资料阅读：
+
+* [basic-theory-of-physically-based-rendering](https://marmoset.co/posts/basic-theory-of-physically-based-rendering)
+* [physically-based-rendering-and-you-can-too](https://marmoset.co/posts/physically-based-rendering-and-you-can-too)
+
+### 如何加载材质/纹理
+
+在 `JavaScript` 中我们有 `Image` 类来实现贴图的加载，不过在 `Three.js` 中提供了 `TextureLoader` 类，更方便我们的贴图加载处理。
