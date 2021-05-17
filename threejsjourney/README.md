@@ -57,9 +57,9 @@
 
 具体代码参考 [6.js](./demo/src/6.js)
 
-## 材质/纹理 `Texture`
+## 纹理 `Texture`
 
-材质是什么呢？材质就是覆盖在几何体结构 `Geometry` 上的图像。我们之前接触到的材质都是简单的颜色材质，在实际的开发过程中我们需要更多多样化的材质，不同类型的材质在呈现上也有不同的效果，不仅仅是颜色上的差异。下面我们来认识几种典型的材质类型：
+纹理是什么呢？纹理就是覆盖在几何体结构 `Geometry` 上的图像。我们之前接触到的纹理都是简单的颜色纹理，在实际的开发过程中我们需要更多多样化的纹理，不同类型的纹理在呈现上也有不同的效果，不仅仅是颜色上的差异。下面我们来认识几种典型的纹理类型：
 
 * ***albedo texture*** 是最简单的一种，它只会将纹理的像素并作用于几何体结构上
 
@@ -92,6 +92,6 @@
 * [basic-theory-of-physically-based-rendering](https://marmoset.co/posts/basic-theory-of-physically-based-rendering)
 * [physically-based-rendering-and-you-can-too](https://marmoset.co/posts/physically-based-rendering-and-you-can-too)
 
-### 如何加载材质/纹理
+### 如何加载纹理
 
 在 `JavaScript` 中我们有 `Image` 类来实现贴图的加载，不过在 `Three.js` 中提供了 `TextureLoader` 类，更方便我们的贴图加载处理。
