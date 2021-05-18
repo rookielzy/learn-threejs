@@ -94,4 +94,45 @@
 
 ### 如何加载纹理
 
-在 `JavaScript` 中我们有 `Image` 类来实现贴图的加载，不过在 `Three.js` 中提供了 `TextureLoader` 类，更方便我们的贴图加载处理。
+在 `JavaScript` 中我们有 `Image` 类来实现贴图的加载，不过在 `Three.js` 中提供了 `TextureLoader` 类，更方便我们的贴图加载处理；并且还提供了 `LoadingManager` 类辅助我们更好地管理加载贴图
+
+```js
+const image = new Image()
+image.onload = () => {
+  console.log('image loaded')
+}
+image.src = 'http://xxx.com/xxx.jpg'
+
+const textureLoader = new THREE.TextureLoader()
+const texture = textureLoader.load(
+  'texture/door/color.jpg',
+  () => {
+    console.log('loading finished')
+  },
+  () => {
+    console.log('loading progressing')
+  },
+  () => {
+    console.log('loading error')
+  }
+)
+
+const loadingManager = new THREE.LoadingManager()
+loadingManager.onStart = () => {
+  console.log('loading started')
+}
+
+loadingManager.onLoaded = () => {
+  console.log('loading finished')
+}
+
+loadingManager.onProgress = () => {
+  console.log('loading progressing')
+}
+
+loadingManager.onError = () => {
+  console.log('loading error')
+}
+
+const textureLoader = new THREE.TextureLoader(loadingManager)
+```
