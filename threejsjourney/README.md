@@ -136,3 +136,7 @@ loadingManager.onError = () => {
 
 const textureLoader = new THREE.TextureLoader(loadingManager)
 ```
+
+具体代码参考 [7.js](./demo/src/7.js)
+
+纹理相关的内容比较多，这里暂时不展开描述，许多的 3D 建模软件也能很好的辅助我们使用纹理，后续再继续补充纹理相关应用。
