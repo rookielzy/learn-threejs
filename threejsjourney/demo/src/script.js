@@ -38,29 +38,35 @@ const parameters = {
   color: 0xff0000
 }
 
-const geometry = new THREE.BoxBufferGeometry(1, 1, 1)
-const textureLoader = new THREE.TextureLoader()
-const texture = textureLoader.load('/albedo-texture.jpeg')
-texture.repeat.x = 2
-texture.repeat.y = 3
-texture.wrapS = THREE.RepeatWrapping
-texture.wrapT = THREE.RepeatWrapping
-texture.offset.x = 0.5
-texture.offset.y = 0.5
-const material = new THREE.MeshBasicMaterial({map: texture})
-const cube = new THREE.Mesh(geometry, material)
+const material = new THREE.MeshNormalMaterial()
 
-scene.add(cube)
+material.flatShading = true
+
+const sphere = new THREE.Mesh(
+  new THREE.SphereBufferGeometry(0.5, 16, 16),
+  material
+)
+
+sphere.position.x = -1.5
+
+const plane = new THREE.Mesh(
+  new THREE.PlaneBufferGeometry(1, 1),
+  material
+)
+
+const torus = new THREE.Mesh(
+  new THREE.TorusBufferGeometry(0.3, 0.2, 16, 32),
+  material
+)
+
+torus.position.x = 1.5
+
+scene.add(sphere, plane, torus)
 
 // debug
 const gui = new dat.GUI()
 
 // step slider
-gui.add(cube.position, 'x').min(-3).max(3).step(0.01).name('x axis')
-gui.add(cube.position, 'y').min(-3).max(3).step(0.01).name('y axis')
-gui.add(cube.position, 'z').min(-3).max(3).step(0.01).name('z axis')
-// boolean
-gui.add(cube, 'visible')
 gui.add(material, 'wireframe')
 
 // color picker
@@ -84,6 +90,11 @@ const clock = new THREE.Clock()
 
 function render() {
   const time = clock.getElapsedTime()
+
+  sphere.rotation.y = 0.1 * time
+  plane.rotation.y = 0.1 * time
+  torus.rotation.y = 0.1 * time
+
   renderer.render(scene, camera)
 
   requestAnimationFrame(render)
