@@ -3,6 +3,7 @@ import './style.css'
 import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 import dat from 'three/examples/jsm/libs/dat.gui.module.js'
+import { SceneUtils } from 'three/examples/jsm/utils/SceneUtils.js'
 import { initTrackballControls } from './utils'
 
 // fps
@@ -101,6 +102,50 @@ gui.add(controls, 'addCube')
 gui.add(controls, 'removeCube')
 gui.add(controls, 'outputObjects')
 gui.add(controls, 'numberOfObjects')
+
+const vertices = [
+  new THREE.Vector3(1, 3, 1),
+  new THREE.Vector3(1, 3, -1),
+  new THREE.Vector3(1, -1, 1),
+  new THREE.Vector3(1, -1, -1),
+  new THREE.Vector3(-1, 3, -1),
+  new THREE.Vector3(-1, 3, 1),
+  new THREE.Vector3(-1, -1, -1),
+  new THREE.Vector3(-1, -1, 1)
+]
+
+const faces = [
+  new THREE.Face3(0, 2, 1),
+  new THREE.Face3(2, 3, 1),
+  new THREE.Face3(4, 6, 5),
+  new THREE.Face3(6, 7, 5),
+  new THREE.Face3(4, 5, 1),
+  new THREE.Face3(5, 0, 1),
+  new THREE.Face3(7, 6, 2),
+  new THREE.Face3(6, 3, 2),
+  new THREE.Face3(5, 7, 0),
+  new THREE.Face3(7, 2, 0),
+  new THREE.Face3(1, 3, 4),
+  new THREE.Face3(3, 6, 4)
+]
+
+const geom = new THREE.Geometry()
+geom.vertices = vertices
+geom.faces = faces
+geom.computeFaceNormals()
+
+const materials = [
+  new THREE.MeshBasicMaterial({color: 0x000000, wireframe: true}),
+  new THREE.MeshLambertMaterial({opacity: 0.6, color: 0x44ff44, transparent: true})
+]
+
+const mesh = SceneUtils.createMultiMaterialObject(geom, materials)
+mesh.castShadow = true
+mesh.children.forEach(obj => {
+  obj.castShadow = true
+})
+
+scene.add(mesh)
 
 const trackballControls = initTrackballControls(camera, renderer)
 const clock = new THREE.Clock()
