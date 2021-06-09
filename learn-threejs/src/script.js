@@ -12,6 +12,9 @@ document.body.appendChild(stats.dom)
 
 // Scene
 const scene = new THREE.Scene()
+// scene.fog = new THREE.Fog(0xffffff, 0.015, 100)
+scene.fog = new THREE.FogExp2(0xffffff, 0.01)
+scene.overrideMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
 
 // Create a canera, which defines where we're looking at.
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -26,18 +29,19 @@ renderer.shadowMap.enabled = true
 const axes = new THREE.AxesHelper(20)
 // scene.add(axes)
 
+// ambientLight
+const ambientLight = new THREE.AmbientLight(0x3c3c3c)
+scene.add(ambientLight)
+
 // spot light
 const spotLight = new THREE.SpotLight(0xffffff)
 spotLight.position.set(-40, 40, -15)
 spotLight.castShadow = true
-spotLight.shadow.mapSize = new THREE.Vector2(1024, 1024)
-spotLight.shadow.camera.far = 130
-spotLight.shadow.camera.near = 40
 
 scene.add(spotLight)
 
 // create the ground plane
-const planeGeometry = new THREE.PlaneGeometry(60, 20)
+const planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1)
 const planeMaterial = new THREE.MeshLambertMaterial({
   color: 0xffffff
 })
@@ -51,36 +55,6 @@ plane.position.set(15, 0, 0)
 // add the plane to the scene
 scene.add(plane)
 
-// create a cube
-const cubeGeometry = new THREE.BoxGeometry(4, 4, 4)
-const cubeMaterial = new THREE.MeshLambertMaterial({
-  color: 0xff0000,
-  wireframe: false
-})
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
-cube.castShadow = true
-
-// position the cube
-cube.position.set(-4, 3, 0)
-
-// add the cube to the scene
-scene.add(cube)
-
-// create a sphere
-const sphereGeometry = new THREE.SphereGeometry(4, 20, 20)
-const sphereMaterial = new THREE.MeshLambertMaterial({
-  color: 0x7777ff,
-  wireframe: false
-})
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-sphere.castShadow = true
-
-// position the sphere
-sphere.position.set(20, 4, 2)
-
-// add the sphere to the scene
-scene.add(sphere)
-
 // position and point the camera to the center of the scene
 camera.position.set(-30, 40, 30)
 camera.lookAt(scene.position)
@@ -90,14 +64,43 @@ document.getElementById('webgl-output').appendChild(renderer.domElement)
 
 const controls = {
   rotationSpeed: 0.02,
-  bouncingSpeed: 0.03
+  bouncingSpeed: 0.03,
+  numberOfObjects: scene.children.length,
+  addCube () {
+    const cubeSize = Math.ceil(Math.random() * 3)
+    const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
+    const cubeMaterial = new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff })
+
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
+    cube.castShadow = true
+    cube.name = 'cube-' + scene.children.length
+    cube.position.x = -30 + Math.round((Math.random() * planeGeometry.parameters.width))
+    cube.position.y = Math.round((Math.random() * 5))
+    cube.position.z = -20 + Math.round((Math.random() * planeGeometry.parameters.height))
+
+    scene.add(cube)
+    this.numberOfObjects = scene.children.length
+  },
+  removeCube () {
+    const allChilren = scene.children
+    const lastObject = allChilren[allChilren.length - 1]
+    if (lastObject instanceof THREE.Mesh) {
+      scene.remove(lastObject)
+      this.numberOfObjects = scene.children.length
+    }
+  },
+  outputObjects () {
+    console.log(scene.children)
+  }
 }
 
 const gui = new dat.GUI()
 gui.add(controls, 'rotationSpeed', 0, 0.5)
 gui.add(controls, 'bouncingSpeed', 0, 0.5)
-
-let step = 0
+gui.add(controls, 'addCube')
+gui.add(controls, 'removeCube')
+gui.add(controls, 'outputObjects')
+gui.add(controls, 'numberOfObjects')
 
 const trackballControls = initTrackballControls(camera, renderer)
 const clock = new THREE.Clock()
@@ -114,16 +117,14 @@ function renderScene() {
   // update the stats and the controls
   trackballControls.update(clock.getDelta())
   stats.update()
-  
-  // animate the cube
-  cube.rotation.x += controls.rotationSpeed
-  cube.rotation.y += controls.rotationSpeed
-  cube.rotation.z += controls.rotationSpeed
 
-  // bouncing the sphere
-  step += controls.bouncingSpeed
-  sphere.position.x = 20 + 10 * Math.cos(step)
-  sphere.position.y = 2 + 10 * Math.abs(Math.sin(step))
+  scene.traverse((obj) => {
+    if (obj instanceof THREE.Mesh && obj !== plane) {
+      obj.rotation.x += controls.rotationSpeed
+      obj.rotation.y += controls.rotationSpeed
+      obj.rotation.z += controls.rotationSpeed
+    }
+  })
 
   requestAnimationFrame(renderScene)
   
