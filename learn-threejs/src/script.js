@@ -14,8 +14,8 @@ document.body.appendChild(stats.dom)
 // Scene
 const scene = new THREE.Scene()
 // scene.fog = new THREE.Fog(0xffffff, 0.015, 100)
-scene.fog = new THREE.FogExp2(0xffffff, 0.01)
-scene.overrideMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
+// scene.fog = new THREE.FogExp2(0xffffff, 0.01)
+// scene.overrideMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
 
 // Create a canera, which defines where we're looking at.
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -31,15 +31,8 @@ const axes = new THREE.AxesHelper(20)
 // scene.add(axes)
 
 // ambientLight
-const ambientLight = new THREE.AmbientLight(0x3c3c3c)
+const ambientLight = new THREE.AmbientLight(0x494949)
 scene.add(ambientLight)
-
-// spot light
-const spotLight = new THREE.SpotLight(0xffffff)
-spotLight.position.set(-40, 40, -15)
-spotLight.castShadow = true
-
-scene.add(spotLight)
 
 // create the ground plane
 const planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1)
@@ -96,12 +89,12 @@ const controls = {
 }
 
 const gui = new dat.GUI()
-gui.add(controls, 'rotationSpeed', 0, 0.5)
-gui.add(controls, 'bouncingSpeed', 0, 0.5)
-gui.add(controls, 'addCube')
-gui.add(controls, 'removeCube')
+// gui.add(controls, 'rotationSpeed', 0, 0.5)
+// gui.add(controls, 'bouncingSpeed', 0, 0.5)
+// gui.add(controls, 'addCube')
+// gui.add(controls, 'removeCube')
 gui.add(controls, 'outputObjects')
-gui.add(controls, 'numberOfObjects')
+// gui.add(controls, 'numberOfObjects')
 
 const vertices = [
   new THREE.Vector3(1, 3, 1),
@@ -129,6 +122,8 @@ const faces = [
   new THREE.Face3(3, 6, 4)
 ]
 
+gui.add(vertices[0], 'x', 0, 10)
+
 const geom = new THREE.Geometry()
 geom.vertices = vertices
 geom.faces = faces
@@ -140,12 +135,23 @@ const materials = [
 ]
 
 const mesh = SceneUtils.createMultiMaterialObject(geom, materials)
+mesh.position.y = 1.5
 mesh.castShadow = true
 mesh.children.forEach(obj => {
   obj.castShadow = true
 })
 
 scene.add(mesh)
+
+// spot light
+const spotLight = new THREE.SpotLight(0xffffff, 1, 180, Math.PI/4)
+spotLight.shadow.mapSize.height = 2048
+spotLight.shadow.mapSize.width = 2048
+spotLight.position.set(-40, 30, 30)
+spotLight.castShadow = true
+spotLight.lookAt(mesh)
+
+scene.add(spotLight)
 
 const trackballControls = initTrackballControls(camera, renderer)
 const clock = new THREE.Clock()
@@ -158,17 +164,46 @@ function onResize() {
   renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
+function addControl(x, y, z) {
+  return {
+    x,
+    y,
+    z
+  }
+}
+
+const controlPoints = []
+controlPoints.push(addControl(3, 5, 3))
+controlPoints.push(addControl(3, 5, 0))
+controlPoints.push(addControl(3, 0, 3))
+controlPoints.push(addControl(3, 0, 0))
+controlPoints.push(addControl(0, 5, 0))
+controlPoints.push(addControl(0, 5, 3))
+controlPoints.push(addControl(0, 0, 0))
+controlPoints.push(addControl(0, 0, 3))
+
+for (let i = 0; i < 8; i++) {
+  const f1 = gui.addFolder(`Vertices${i + 1}`)
+  f1.add(controlPoints[i], 'x', -10, 10)
+  f1.add(controlPoints[i], 'y', -10, 10)
+  f1.add(controlPoints[i], 'z', -10, 10)
+}
+
 function renderScene() {
   // update the stats and the controls
   trackballControls.update(clock.getDelta())
   stats.update()
 
-  scene.traverse((obj) => {
-    if (obj instanceof THREE.Mesh && obj !== plane) {
-      obj.rotation.x += controls.rotationSpeed
-      obj.rotation.y += controls.rotationSpeed
-      obj.rotation.z += controls.rotationSpeed
-    }
+  const vertices = [];
+  for (let i = 0; i < 8; i++) {
+      vertices.push(new THREE.Vector3(controlPoints[i].x, controlPoints[i].y, controlPoints[i].z));
+  }
+
+  mesh.children.forEach(obj => {
+    obj.geometry.vertices = vertices
+    obj.geometry.vericesNeedUpdate = true
+    obj.geometry.computeFaceNormals()
+    delete obj.geometry.__directGeometry
   })
 
   requestAnimationFrame(renderScene)
