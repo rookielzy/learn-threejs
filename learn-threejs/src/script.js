@@ -56,10 +56,42 @@ camera.lookAt(scene.position)
 // add the output of the renderer to the html element
 document.getElementById('webgl-output').appendChild(renderer.domElement)
 
+const cube = new THREE.Mesh(
+  new THREE.BoxGeometry(5, 8, 3),
+  new THREE.MeshLambertMaterial({color: 0x44ff44})
+)
+
+cube.position.y = 4
+cube.castShadow = true
+scene.add(cube)
+
 const controls = {
   rotationSpeed: 0.02,
   bouncingSpeed: 0.03,
   numberOfObjects: scene.children.length,
+  scaleX: 1,
+  scaleY: 1,
+  scaleZ: 1,
+  positionX: 0,
+  positionY: 0,
+  positionZ: 0,
+  rotationX: 0,
+  rotationY: 0,
+  rotationZ: 0,
+  scale: 1,
+  translateX: 0,
+  translateY: 0,
+  translateZ: 0,
+  visible: true,
+  translate () {
+    cube.translateX(controls, this.translateX)
+    cube.translateY(controls, this.translateY)
+    cube.translateZ(controls, this.translateZ)
+
+    controls.positionX = cube.position.x
+    controls.positionY = cube.position.y
+    controls.positionZ = cube.position.z
+  },
   addCube () {
     const cubeSize = Math.ceil(Math.random() * 3)
     const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
@@ -141,7 +173,9 @@ mesh.children.forEach(obj => {
   obj.castShadow = true
 })
 
-scene.add(mesh)
+// scene.add(mesh)
+
+
 
 // spot light
 const spotLight = new THREE.SpotLight(0xffffff, 1, 180, Math.PI/4)
@@ -164,6 +198,29 @@ function onResize() {
   renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
+function clone() {
+  const clonedGeometry = mesh.children[0].geometry.clone()
+  const materials = [
+    new THREE.MeshLambertMaterial({opacity: 0.8, color: 0xff44ff, transparent: true}),
+    new THREE.MeshBasicMaterial({color: 0x000000, wireframe: true})
+  ]
+
+  const mesh2 = SceneUtils.createMultiMaterialObject(clonedGeometry, materials)
+  mesh2.children.forEach(obj => {
+    obj.castShadow = true
+  })
+
+  mesh2.translateX(5)
+  mesh2.translateZ(5)
+  mesh2.name = 'clone'
+  scene.remove(scene.getChildByName('clone'))
+  scene.add(mesh2)
+}
+
+controls.clone = clone
+
+gui.add(controls, 'clone')
+
 function addControl(x, y, z) {
   return {
     x,
@@ -182,12 +239,30 @@ controlPoints.push(addControl(0, 5, 3))
 controlPoints.push(addControl(0, 0, 0))
 controlPoints.push(addControl(0, 0, 3))
 
-for (let i = 0; i < 8; i++) {
-  const f1 = gui.addFolder(`Vertices${i + 1}`)
-  f1.add(controlPoints[i], 'x', -10, 10)
-  f1.add(controlPoints[i], 'y', -10, 10)
-  f1.add(controlPoints[i], 'z', -10, 10)
-}
+// for (let i = 0; i < 8; i++) {
+//   const f1 = gui.addFolder(`Vertices${i + 1}`)
+//   f1.add(controlPoints[i], 'x', -10, 10)
+//   f1.add(controlPoints[i], 'y', -10, 10)
+//   f1.add(controlPoints[i], 'z', -10, 10)
+// }
+
+const guiScale = gui.addFolder('scale')
+guiScale.add(controls, 'scaleX', 0, 5)
+guiScale.add(controls, 'scaleY', 0, 5)
+guiScale.add(controls, 'scaleZ', 0, 5)
+
+const guiPosition = gui.addFolder('position')
+guiPosition.add(controls, 'positionX', -10, 10).onChange(value => {
+  cube.position.x = value
+})
+guiPosition.add(controls, 'positionY', -10, 10).onChange(value => {
+  cube.position.y = value
+})
+guiPosition.add(controls, 'positionZ', -10, 10).onChange(value => {
+  cube.position.z = value
+})
+
+gui.add(controls, 'visible')
 
 function renderScene() {
   // update the stats and the controls
@@ -199,13 +274,16 @@ function renderScene() {
       vertices.push(new THREE.Vector3(controlPoints[i].x, controlPoints[i].y, controlPoints[i].z));
   }
 
-  mesh.children.forEach(obj => {
-    obj.geometry.vertices = vertices
-    obj.geometry.vericesNeedUpdate = true
-    obj.geometry.computeFaceNormals()
-    delete obj.geometry.__directGeometry
-  })
+  // mesh.children.forEach(obj => {
+  //   obj.geometry.vertices = vertices
+  //   obj.geometry.vericesNeedUpdate = true
+  //   obj.geometry.computeFaceNormals()
+  //   delete obj.geometry.__directGeometry
+  // })
 
+  cube.visible = controls.visible
+
+  cube.scale.set(controls.scaleX, controls.scaleY, controls.scaleZ)
   requestAnimationFrame(renderScene)
   
   // render the scene
