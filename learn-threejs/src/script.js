@@ -31,6 +31,7 @@ scene.add(ambientLight)
 
 const spotLight = new THREE.SpotLight(0xffffff, 1, 100, Math.PI / 4)
 spotLight.shadow.mapSize.set(2048, 2048)
+spotLight.position.set(-30, 40, -10)
 spotLight.castShadow = true
 scene.add(spotLight)
 
