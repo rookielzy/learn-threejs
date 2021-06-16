@@ -1,5 +1,42 @@
 import * as THREE from 'three'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
+import Stats from 'three/examples/jsm/libs/stats.module';
+
+/**
+ * Initialize the statistics domelement
+ * 
+ * @param {Number} type 0: fps, 1: ms, 2: mb, 3+: custom
+ * @returns stats javascript object
+ */
+export function initStats(type) {
+  const panelType = (typeof type !== 'undefined' && type) && (!Number.isNaN(type)) ? parseInt(type) : 0
+  const stats = new Stats()
+
+  stats.showPanel(panelType)
+  document.body.appendChild(stats.dom)
+
+  return stats
+}
+
+/**
+ * Initialize a simple default renderer and binds it to the "webgl-output" dom
+* element.
+ * 
+ * @param additionalProperties Additional properties to pass into the renderer
+ */
+export function initRenderer(additionalProperties) {
+  const props = (typeof additionalProperties !== 'undefined' && additionalProperties) ? additionalProperties : {}
+  const renderer = new THREE.WebGLRenderer(props)
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+  renderer.setClearColor(new THREE.Color(0x000000))
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.shadowMap.enabled = true
+  document.getElementById('webgl-output').appendChild(renderer.domElement)
+
+  return renderer
+}
 
 /**
  * Initialize trackball controls to control the scene
