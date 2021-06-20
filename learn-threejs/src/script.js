@@ -36,7 +36,7 @@ spotLight.position.set(-40, 60, -10)
 spotLight.castShadow = true
 spotLight.shadow.camera.near = 1
 spotLight.shadow.camera.far = 100
-spotLight.target = plane
+spotLight.target = target
 spotLight.distance = 0
 spotLight.angle = 0.4
 spotLight.shadow.camera.fov = 120
@@ -142,7 +142,7 @@ function setupControls() {
     spotLight.penumbra = value
   })
 
-  gui.add(controls, 'distance', 0, 5).onChange(value => {
+  gui.add(controls, 'distance', 0, 20).onChange(value => {
     spotLight.distance = value
   })
 
@@ -156,6 +156,20 @@ function setupControls() {
 
   gui.add(controls, 'castShadow').onChange(value => {
     spotLight.castShadow = value
+  })
+
+  gui.add(controls, 'target', ['Plane', 'Sphere', 'Cube']).onChange(value => {
+    switch (value) {
+      case 'Plane':
+        spotLight.target = plane
+        break
+      case 'Sphere':
+        spotLight.target = sphere
+        break
+      case 'Cube':
+        spotLight.target = cube
+        break
+    }
   })
 
   gui.add(controls, 'stopMovingLight').onChange(value => {
